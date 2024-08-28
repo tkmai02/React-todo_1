@@ -2,20 +2,16 @@
 import React from "react";
 
 function MainComponent() {
-  // TODOリストの状態を管理するための useState フック
   const [todos, setTodos] = React.useState([]);
-  // 新しいTODOの入力状態を管理するための useState フック
   const [newTodo, setNewTodo] = React.useState({
     title: "",
     details: "",
     status: "未着手",
   });
-  // フィルタリング状態を管理するための useState フック
   const [filter, setFilter] = React.useState("全て");
-  // ソート基準を管理するための useState フック
   const [sortBy, setSortBy] = React.useState("登録日");
+  const [editingTodo, setEditingTodo] = React.useState(null);
 
-  // 新しいTODOを追加する関数
   const addTodo = () => {
     if (newTodo.title) {
       const currentDate = new Date().toISOString();
@@ -32,12 +28,10 @@ function MainComponent() {
     }
   };
 
-  // TODOを削除する関数
   const deleteTodo = (id) => {
     setTodos(todos.filter((todo) => todo.id !== id));
   };
 
-  // TODOを編集する関数
   const editTodo = (id, updatedTodo) => {
     setTodos(
       todos.map((todo) =>
@@ -46,9 +40,9 @@ function MainComponent() {
           : todo
       )
     );
+    setEditingTodo(null);
   };
 
-  // TODOをソートする処理
   const sortedTodos = [...todos].sort((a, b) => {
     if (sortBy === "登録日") {
       return new Date(a.createdAt) - new Date(b.createdAt);
@@ -57,12 +51,10 @@ function MainComponent() {
     }
   });
 
-  // TODOをフィルタリングする処理
   const filteredTodos = sortedTodos.filter(
     (todo) => filter === "全て" || todo.status === filter
   );
 
-  // ステータスに応じたタグの色を定義する関数
   const getStatusColor = (status) => {
     switch (status) {
       case "未着手":
@@ -141,9 +133,17 @@ function MainComponent() {
       <TodoList
         todos={filteredTodos}
         onDelete={deleteTodo}
-        onEdit={editTodo}
+        onEdit={(todo) => setEditingTodo(todo)}
         getStatusColor={getStatusColor}
       />
+
+      {editingTodo && (
+        <EditModal
+          todo={editingTodo}
+          onSave={(updatedTodo) => editTodo(editingTodo.id, updatedTodo)}
+          onClose={() => setEditingTodo(null)}
+        />
+      )}
     </div>
   );
 }
@@ -179,13 +179,7 @@ function TodoList({ todos, onDelete, onEdit, getStatusColor }) {
               削除
             </button>
             <button
-              onClick={() => {
-                const newTitle = prompt("新しいタイトル", todo.title);
-                const newDetails = prompt("新しい詳細", todo.details);
-                if (newTitle && newDetails) {
-                  onEdit(todo.id, { title: newTitle, details: newDetails });
-                }
-              }}
+              onClick={() => onEdit(todo)}
               className="bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-600 transition-colors"
             >
               編集
@@ -194,6 +188,57 @@ function TodoList({ todos, onDelete, onEdit, getStatusColor }) {
         </li>
       ))}
     </ul>
+  );
+}
+
+function EditModal({ todo, onSave, onClose }) {
+  const [editedTodo, setEditedTodo] = React.useState(todo);
+
+  const handleSave = () => {
+    onSave(editedTodo);
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div className="bg-white p-6 rounded-lg w-96">
+        <h2 className="text-2xl font-bold mb-4">TODO編集</h2>
+        <input
+          type="text"
+          value={editedTodo.title}
+          onChange={(e) =>
+            setEditedTodo({ ...editedTodo, title: e.target.value })
+          }
+          className="border p-2 mb-2 w-full rounded"
+          placeholder="タイトル"
+          name="title"
+        />
+        <textarea
+          value={editedTodo.details}
+          onChange={(e) =>
+            setEditedTodo({ ...editedTodo, details: e.target.value })
+          }
+          className="border p-2 mb-4 w-full rounded"
+          placeholder="詳細"
+          rows="3"
+          name="details"
+        ></textarea>
+        <div className="flex justify-end space-x-2">
+          <button
+            onClick={onClose}
+            className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400 transition-colors"
+          >
+            キャンセル
+          </button>
+          <button
+            onClick={handleSave}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+          >
+            保存
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
