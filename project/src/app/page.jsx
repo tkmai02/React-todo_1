@@ -7,11 +7,11 @@ function MainComponent() {
     title: "",
     details: "",
     status: "未着手",
+    dueDate: "",
   });
   const [filter, setFilter] = React.useState("全て");
   const [sortBy, setSortBy] = React.useState("登録日");
   const [editingTodo, setEditingTodo] = React.useState(null);
-
   const addTodo = () => {
     if (newTodo.title) {
       const currentDate = new Date().toISOString();
@@ -24,14 +24,12 @@ function MainComponent() {
           updatedAt: currentDate,
         },
       ]);
-      setNewTodo({ title: "", details: "", status: "未着手" });
+      setNewTodo({ title: "", details: "", status: "未着手", dueDate: "" });
     }
   };
-
   const deleteTodo = (id) => {
     setTodos(todos.filter((todo) => todo.id !== id));
   };
-
   const editTodo = (id, updatedTodo) => {
     setTodos(
       todos.map((todo) =>
@@ -50,11 +48,9 @@ function MainComponent() {
       return new Date(a.updatedAt) - new Date(b.updatedAt);
     }
   });
-
   const filteredTodos = sortedTodos.filter(
     (todo) => filter === "全て" || todo.status === filter
   );
-
   const getStatusColor = (status) => {
     switch (status) {
       case "未着手":
@@ -88,6 +84,13 @@ function MainComponent() {
           placeholder="TODOの詳細"
           className="border p-2 mr-2 rounded"
           name="details"
+        />
+        <input
+          type="date"
+          value={newTodo.dueDate || ""}
+          onChange={(e) => setNewTodo({ ...newTodo, dueDate: e.target.value })}
+          className="border p-2 mr-2 rounded"
+          name="dueDate"
         />
         <select
           value={newTodo.status}
@@ -165,6 +168,11 @@ function TodoList({ todos, onDelete, onEdit, getStatusColor }) {
               {todo.status}
             </span>
           </p>
+          {todo.dueDate && (
+            <p className="text-xs text-gray-500 mt-1">
+              期限: {new Date(todo.dueDate).toLocaleDateString()}
+            </p>
+          )}
           <p className="text-xs text-gray-500 mt-1">
             登録日: {new Date(todo.createdAt).toLocaleString()}
           </p>
@@ -212,6 +220,15 @@ function EditModal({ todo, onSave, onClose }) {
           className="border p-2 mb-2 w-full rounded"
           placeholder="タイトル"
           name="title"
+        />
+        <input
+          type="date"
+          value={editedTodo.dueDate || ""}
+          onChange={(e) =>
+            setEditedTodo({ ...editedTodo, dueDate: e.target.value })
+          }
+          className="border p-2 mb-2 w-full rounded"
+          name="dueDate"
         />
         <textarea
           value={editedTodo.details}
