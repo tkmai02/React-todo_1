@@ -11,7 +11,6 @@ function MainComponent() {
   const [filter, setFilter] = React.useState("全て");
   const [sortBy, setSortBy] = React.useState("登録日");
   const [editingTodo, setEditingTodo] = React.useState(null);
-
   const addTodo = () => {
     if (newTodo.title) {
       const currentDate = new Date().toISOString();
@@ -27,7 +26,6 @@ function MainComponent() {
       setNewTodo({ title: "", details: "", status: "未着手" });
     }
   };
-
   const deleteTodo = (id) => {
     setTodos(todos.filter((todo) => todo.id !== id));
   };
@@ -42,7 +40,6 @@ function MainComponent() {
     );
     setEditingTodo(null);
   };
-
   const sortedTodos = [...todos].sort((a, b) => {
     if (sortBy === "登録日") {
       return new Date(a.createdAt) - new Date(b.createdAt);
@@ -50,11 +47,9 @@ function MainComponent() {
       return new Date(a.updatedAt) - new Date(b.updatedAt);
     }
   });
-
   const filteredTodos = sortedTodos.filter(
     (todo) => filter === "全て" || todo.status === filter
   );
-
   const getStatusColor = (status) => {
     switch (status) {
       case "未着手":
@@ -96,15 +91,15 @@ function MainComponent() {
               <div className="flex gap-2">
                 <button
                   onClick={() => onEdit(todo)}
-                  className="px-3 py-1 bg-gray-100 rounded hover:bg-gray-200"
+                  className="px-3 py-1 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 transition-colors duration-200 shadow-sm"
                 >
-                  <i className="fas fa-edit"></i>
+                  編集
                 </button>
                 <button
                   onClick={() => onDelete(todo.id)}
-                  className="px-3 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200"
+                  className="px-3 py-1 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors duration-200 shadow-sm"
                 >
-                  <i className="fas fa-trash"></i>
+                  削除
                 </button>
               </div>
             </div>
