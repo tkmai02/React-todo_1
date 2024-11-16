@@ -68,175 +68,199 @@ function MainComponent() {
     }
   };
 
-  return (
-    <div className="container mx-auto p-4 font-sans">
-      <h1 className="text-3xl font-bold mb-4">TODOリスト</h1>
-
-      <div className="mb-4">
-        <input
-          type="text"
-          value={newTodo.title}
-          onChange={(e) => setNewTodo({ ...newTodo, title: e.target.value })}
-          placeholder="TODOのタイトル"
-          className="border p-2 mr-2 rounded"
-          name="title"
-        />
-        <input
-          type="text"
-          value={newTodo.details}
-          onChange={(e) => setNewTodo({ ...newTodo, details: e.target.value })}
-          placeholder="TODOの詳細"
-          className="border p-2 mr-2 rounded"
-          name="details"
-        />
-        <select
-          value={newTodo.status}
-          onChange={(e) => setNewTodo({ ...newTodo, status: e.target.value })}
-          className="border p-2 mr-2 rounded"
-          name="status"
-        >
-          <option value="未着手">未着手</option>
-          <option value="進行中">進行中</option>
-          <option value="完了">完了</option>
-        </select>
-        <button
-          onClick={addTodo}
-          className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition-colors"
-        >
-          追加
-        </button>
+  function TodoList({ todos, onDelete, onEdit, getStatusColor }) {
+    return (
+      <div className="space-y-4">
+        {todos.map((todo) => (
+          <div key={todo.id} className="bg-white p-4 rounded-lg shadow-md">
+            <div className="flex justify-between items-start mb-2">
+              <div>
+                <h3 className="text-xl font-semibold">{todo.title}</h3>
+                <p className="text-gray-600">{todo.details}</p>
+                <div className="flex gap-2 mt-2">
+                  <span
+                    className={`px-2 py-1 rounded-full text-sm ${getStatusColor(
+                      todo.status
+                    )}`}
+                  >
+                    {todo.status}
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    作成: {new Date(todo.createdAt).toLocaleString()}
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    更新: {new Date(todo.updatedAt).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => onEdit(todo)}
+                  className="px-3 py-1 bg-gray-100 rounded hover:bg-gray-200"
+                >
+                  <i className="fas fa-edit"></i>
+                </button>
+                <button
+                  onClick={() => onDelete(todo.id)}
+                  className="px-3 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200"
+                >
+                  <i className="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
+    );
+  }
 
-      <div className="mb-4">
-        <select
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          className="border p-2 mr-2 rounded"
-          name="filter"
-        >
-          <option value="全て">全て</option>
-          <option value="未着手">未着手</option>
-          <option value="進行中">進行中</option>
-          <option value="完了">完了</option>
-        </select>
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-          className="border p-2 rounded"
-          name="sortBy"
-        >
-          <option value="登録日">登録日</option>
-          <option value="更新日">更新日</option>
-        </select>
-      </div>
+  function EditModal({ todo, onSave, onClose }) {
+    const [editedTodo, setEditedTodo] = React.useState(todo);
 
-      <TodoList
-        todos={filteredTodos}
-        onDelete={deleteTodo}
-        onEdit={(todo) => setEditingTodo(todo)}
-        getStatusColor={getStatusColor}
-      />
+    const handleSave = () => {
+      onSave(editedTodo);
+      onClose();
+    };
 
-      {editingTodo && (
-        <EditModal
-          todo={editingTodo}
-          onSave={(updatedTodo) => editTodo(editingTodo.id, updatedTodo)}
-          onClose={() => setEditingTodo(null)}
-        />
-      )}
-    </div>
-  );
-}
-
-function TodoList({ todos, onDelete, onEdit, getStatusColor }) {
-  return (
-    <ul className="space-y-4">
-      {todos.map((todo) => (
-        <li key={todo.id} className="border p-4 rounded shadow">
-          <h3 className="font-bold text-lg">{todo.title}</h3>
-          <p className="text-gray-600">{todo.details}</p>
-          <p className="text-sm mt-2">
-            ステータス:
-            <span
-              className={`${getStatusColor(
-                todo.status
-              )} px-2 py-1 rounded-full text-xs font-semibold ml-2`}
-            >
-              {todo.status}
-            </span>
-          </p>
-          <p className="text-xs text-gray-500 mt-1">
-            登録日: {new Date(todo.createdAt).toLocaleString()}
-          </p>
-          <p className="text-xs text-gray-500">
-            更新日: {new Date(todo.updatedAt).toLocaleString()}
-          </p>
-          <div className="mt-2 space-x-2">
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="bg-white p-6 rounded-lg w-[90%] max-w-md">
+          <h2 className="text-2xl font-bold mb-4">TODOを編集</h2>
+          <input
+            type="text"
+            value={editedTodo.title}
+            onChange={(e) =>
+              setEditedTodo({ ...editedTodo, title: e.target.value })
+            }
+            className="w-full p-2 border rounded mb-4"
+            placeholder="タイトル"
+            name="title"
+          />
+          <textarea
+            value={editedTodo.details}
+            onChange={(e) =>
+              setEditedTodo({ ...editedTodo, details: e.target.value })
+            }
+            className="w-full p-2 border rounded mb-4"
+            placeholder="詳細"
+            rows="3"
+            name="details"
+          ></textarea>
+          <select
+            value={editedTodo.status}
+            onChange={(e) =>
+              setEditedTodo({ ...editedTodo, status: e.target.value })
+            }
+            className="w-full p-2 border rounded mb-4"
+          >
+            <option value="未着手">未着手</option>
+            <option value="進行中">進行中</option>
+            <option value="完了">完了</option>
+          </select>
+          <div className="flex justify-end gap-2">
             <button
-              onClick={() => onDelete(todo.id)}
-              className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
+              onClick={onClose}
+              className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200"
             >
-              削除
+              キャンセル
             </button>
             <button
-              onClick={() => onEdit(todo)}
-              className="bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-600 transition-colors"
+              onClick={handleSave}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             >
-              編集
+              保存
             </button>
           </div>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-function EditModal({ todo, onSave, onClose }) {
-  const [editedTodo, setEditedTodo] = React.useState(todo);
-
-  const handleSave = () => {
-    onSave(editedTodo);
-    onClose();
-  };
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="bg-white p-6 rounded-lg w-96">
-        <h2 className="text-2xl font-bold mb-4">TODO編集</h2>
-        <input
-          type="text"
-          value={editedTodo.title}
-          onChange={(e) =>
-            setEditedTodo({ ...editedTodo, title: e.target.value })
-          }
-          className="border p-2 mb-2 w-full rounded"
-          placeholder="タイトル"
-          name="title"
-        />
-        <textarea
-          value={editedTodo.details}
-          onChange={(e) =>
-            setEditedTodo({ ...editedTodo, details: e.target.value })
-          }
-          className="border p-2 mb-4 w-full rounded"
-          placeholder="詳細"
-          rows="3"
-          name="details"
-        ></textarea>
-        <div className="flex justify-end space-x-2">
-          <button
-            onClick={onClose}
-            className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400 transition-colors"
-          >
-            キャンセル
-          </button>
-          <button
-            onClick={handleSave}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
-          >
-            保存
-          </button>
+    <div className="min-h-screen bg-gray-100 p-8 font-sans">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold mb-8">TODOリスト</h1>
+
+        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+          <div className="flex flex-col md:flex-row gap-4 mb-4">
+            <input
+              type="text"
+              value={newTodo.title}
+              onChange={(e) =>
+                setNewTodo({ ...newTodo, title: e.target.value })
+              }
+              placeholder="TODOのタイトル"
+              className="flex-1 p-2 border rounded"
+              name="title"
+            />
+            <input
+              type="text"
+              value={newTodo.details}
+              onChange={(e) =>
+                setNewTodo({ ...newTodo, details: e.target.value })
+              }
+              placeholder="TODOの詳細"
+              className="flex-1 p-2 border rounded"
+              name="details"
+            />
+            <select
+              value={newTodo.status}
+              onChange={(e) =>
+                setNewTodo({ ...newTodo, status: e.target.value })
+              }
+              className="p-2 border rounded"
+              name="status"
+            >
+              <option value="未着手">未着手</option>
+              <option value="進行中">進行中</option>
+              <option value="完了">完了</option>
+            </select>
+            <button
+              onClick={addTodo}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              追加
+            </button>
+          </div>
+
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="p-2 border rounded"
+              name="filter"
+            >
+              <option value="全て">全て</option>
+              <option value="未着手">未着手</option>
+              <option value="進行中">進行中</option>
+              <option value="完了">完了</option>
+            </select>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="p-2 border rounded"
+              name="sortBy"
+            >
+              <option value="登録日">登録日</option>
+              <option value="更新日">更新日</option>
+            </select>
+          </div>
         </div>
+
+        <TodoList
+          todos={filteredTodos}
+          onDelete={deleteTodo}
+          onEdit={(todo) => setEditingTodo(todo)}
+          getStatusColor={getStatusColor}
+        />
+
+        {editingTodo && (
+          <EditModal
+            todo={editingTodo}
+            onSave={(updatedTodo) => editTodo(editingTodo.id, updatedTodo)}
+            onClose={() => setEditingTodo(null)}
+          />
+        )}
       </div>
     </div>
   );
