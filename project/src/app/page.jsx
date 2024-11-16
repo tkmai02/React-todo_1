@@ -31,43 +31,67 @@ function MainComponent() {
     // タイトルが入力されている場合のみ追加
     if (newTodo.title) {
       const currentDate = new Date().toISOString();
+
+      // 新しいTODOアイテムを作成
+      const newTodoItem = {
+        id: Date.now(),             // 一意のIDを生成
+        title: newTodo.title,       // タイトル
+        details: newTodo.details,   // 詳細
+        status: newTodo.status,     // ステータス
+        dueDate: newTodo.dueDate,   // 期限日
+        createdAt: currentDate,     // 登録日
+        updatedAt: currentDate,     // 更新日
+      };
+
       // 新しいTODOを既存のTODOリストに追加
-      setTodos([
-        ...todos,
-        {
-          ...newTodo,
-          id: Date.now(),             // 一意のIDを生成
-          createdAt: currentDate,     // 登録日
-          updatedAt: currentDate,     // 更新日
-        },
-      ]);
+      const updatedTodos = todos.concat(newTodoItem);
+      setTodos(updatedTodos);
+
       // 入力フォームをリセット
-      setNewTodo({ title: "", details: "", status: "未着手", dueDate: "" });
+      setNewTodo({
+        title: "",
+        details: "",
+        status: "未着手",
+        dueDate: "",
+      });
     }
   };
 
   // 指定したIDのTODOを削除する関数
   const deleteTodo = (id) => {
     // フィルタリングして削除
-    setTodos(todos.filter((todo) => todo.id !== id));
+    const updatedTodos = todos.filter(function(todo) {
+      return todo.id !== id;
+    });
+    setTodos(updatedTodos);
   };
 
   // TODOを編集する関数
   const editTodo = (id, updatedTodo) => {
     // 指定したIDのTODOを更新
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id
-          ? { ...todo, ...updatedTodo, updatedAt: new Date().toISOString() }
-          : todo
-      )
-    );
+    const updatedTodos = todos.map(function(todo) {
+      if (todo.id === id) {
+        return {
+          id: todo.id,
+          title: updatedTodo.title,
+          details: updatedTodo.details,
+          status: updatedTodo.status,
+          dueDate: updatedTodo.dueDate,
+          createdAt: todo.createdAt,
+          updatedAt: new Date().toISOString(),
+        };
+      } else {
+        return todo;
+      }
+    });
+    setTodos(updatedTodos);
+
     // 編集モードを解除
     setEditingTodo(null);
   };
 
   // ソートされたTODOリストを取得
-  const sortedTodos = [...todos].sort((a, b) => {
+  const sortedTodos = todos.slice().sort(function(a, b) {
     if (sortBy === "登録日") {
       // 登録日でソート
       return new Date(a.createdAt) - new Date(b.createdAt);
@@ -78,9 +102,13 @@ function MainComponent() {
   });
 
   // フィルターに基づいてTODOリストを取得
-  const filteredTodos = sortedTodos.filter(
-    (todo) => filter === "全て" || todo.status === filter
-  );
+  const filteredTodos = sortedTodos.filter(function(todo) {
+    if (filter === "全て") {
+      return true;
+    } else {
+      return todo.status === filter;
+    }
+  });
 
   // ステータスに応じて表示色を取得する関数
   const getStatusColor = (status) => {
@@ -96,6 +124,11 @@ function MainComponent() {
     }
   };
 
+  // 編集ボタンをクリックしたときの処理
+  const handleEdit = (todo) => {
+    setEditingTodo(todo);
+  };
+
   // 画面のレンダリング
   return (
     <div className="container mx-auto p-4 font-sans">
@@ -108,7 +141,14 @@ function MainComponent() {
         <input
           type="text"
           value={newTodo.title}
-          onChange={(e) => setNewTodo({ ...newTodo, title: e.target.value })}
+          onChange={function(e) {
+            setNewTodo({
+              title: e.target.value,
+              details: newTodo.details,
+              status: newTodo.status,
+              dueDate: newTodo.dueDate,
+            });
+          }}
           placeholder="TODOのタイトル"
           className="border p-2 mr-2 rounded"
           name="title"
@@ -117,7 +157,14 @@ function MainComponent() {
         <input
           type="text"
           value={newTodo.details}
-          onChange={(e) => setNewTodo({ ...newTodo, details: e.target.value })}
+          onChange={function(e) {
+            setNewTodo({
+              title: newTodo.title,
+              details: e.target.value,
+              status: newTodo.status,
+              dueDate: newTodo.dueDate,
+            });
+          }}
           placeholder="TODOの詳細"
           className="border p-2 mr-2 rounded"
           name="details"
@@ -126,14 +173,28 @@ function MainComponent() {
         <input
           type="date"
           value={newTodo.dueDate || ""}
-          onChange={(e) => setNewTodo({ ...newTodo, dueDate: e.target.value })}
+          onChange={function(e) {
+            setNewTodo({
+              title: newTodo.title,
+              details: newTodo.details,
+              status: newTodo.status,
+              dueDate: e.target.value,
+            });
+          }}
           className="border p-2 mr-2 rounded"
           name="dueDate"
         />
         {/* ステータス選択 */}
         <select
           value={newTodo.status}
-          onChange={(e) => setNewTodo({ ...newTodo, status: e.target.value })}
+          onChange={function(e) {
+            setNewTodo({
+              title: newTodo.title,
+              details: newTodo.details,
+              status: e.target.value,
+              dueDate: newTodo.dueDate,
+            });
+          }}
           className="border p-2 mr-2 rounded"
           name="status"
         >
@@ -155,7 +216,9 @@ function MainComponent() {
         {/* フィルター選択 */}
         <select
           value={filter}
-          onChange={(e) => setFilter(e.target.value)}
+          onChange={function(e) {
+            setFilter(e.target.value);
+          }}
           className="border p-2 mr-2 rounded"
           name="filter"
         >
@@ -167,7 +230,9 @@ function MainComponent() {
         {/* ソート基準選択 */}
         <select
           value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
+          onChange={function(e) {
+            setSortBy(e.target.value);
+          }}
           className="border p-2 rounded"
           name="sortBy"
         >
@@ -180,7 +245,7 @@ function MainComponent() {
       <TodoList
         todos={filteredTodos}
         onDelete={deleteTodo}
-        onEdit={(todo) => setEditingTodo(todo)}
+        onEdit={handleEdit}
         getStatusColor={getStatusColor}
       />
 
@@ -188,8 +253,10 @@ function MainComponent() {
       {editingTodo && (
         <EditModal
           todo={editingTodo}
-          onSave={(updatedTodo) => editTodo(editingTodo.id, updatedTodo)}
-          onClose={() => setEditingTodo(null)}
+          onSave={editTodo}
+          onClose={function() {
+            setEditingTodo(null);
+          }}
         />
       )}
     </div>
@@ -197,72 +264,96 @@ function MainComponent() {
 }
 
 // TODOリストを表示するコンポーネント
-function TodoList({ todos, onDelete, onEdit, getStatusColor }) {
+function TodoList(props) {
+  const todos = props.todos;
+  const onDelete = props.onDelete;
+  const onEdit = props.onEdit;
+  const getStatusColor = props.getStatusColor;
+
   return (
     <ul className="space-y-4">
-      {todos.map((todo) => (
-        <li key={todo.id} className="border p-4 rounded shadow">
-          {/* タイトル */}
-          <h3 className="font-bold text-lg">{todo.title}</h3>
-          {/* 詳細 */}
-          <p className="text-gray-600">{todo.details}</p>
-          {/* ステータス */}
-          <p className="text-sm mt-2">
-            ステータス:
-            <span
-              className={`${getStatusColor(
-                todo.status
-              )} px-2 py-1 rounded-full text-xs font-semibold ml-2`}
-            >
-              {todo.status}
-            </span>
-          </p>
-          {/* 期限日 */}
-          {todo.dueDate && (
-            <p className="text-xs text-gray-500 mt-1">
-              期限: {new Date(todo.dueDate).toLocaleDateString()}
+      {todos.map(function(todo) {
+        return (
+          <li key={todo.id} className="border p-4 rounded shadow">
+            {/* タイトル */}
+            <h3 className="font-bold text-lg">{todo.title}</h3>
+            {/* 詳細 */}
+            <p className="text-gray-600">{todo.details}</p>
+            {/* ステータス */}
+            <p className="text-sm mt-2">
+              ステータス:
+              <span
+                className={
+                  getStatusColor(todo.status) +
+                  " px-2 py-1 rounded-full text-xs font-semibold ml-2"
+                }
+              >
+                {todo.status}
+              </span>
             </p>
-          )}
-          {/* 登録日 */}
-          <p className="text-xs text-gray-500 mt-1">
-            登録日: {new Date(todo.createdAt).toLocaleString()}
-          </p>
-          {/* 更新日 */}
-          <p className="text-xs text-gray-500">
-            更新日: {new Date(todo.updatedAt).toLocaleString()}
-          </p>
-          {/* 操作ボタン */}
-          <div className="mt-2 space-x-2">
-            {/* 削除ボタン */}
-            <button
-              onClick={() => onDelete(todo.id)}
-              className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
-            >
-              削除
-            </button>
-            {/* 編集ボタン */}
-            <button
-              onClick={() => onEdit(todo)}
-              className="bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-600 transition-colors"
-            >
-              編集
-            </button>
-          </div>
-        </li>
-      ))}
+            {/* 期限日 */}
+            {todo.dueDate && (
+              <p className="text-xs text-gray-500 mt-1">
+                期限: {new Date(todo.dueDate).toLocaleDateString()}
+              </p>
+            )}
+            {/* 登録日 */}
+            <p className="text-xs text-gray-500 mt-1">
+              登録日: {new Date(todo.createdAt).toLocaleString()}
+            </p>
+            {/* 更新日 */}
+            <p className="text-xs text-gray-500">
+              更新日: {new Date(todo.updatedAt).toLocaleString()}
+            </p>
+            {/* 操作ボタン */}
+            <div className="mt-2 space-x-2">
+              {/* 削除ボタン */}
+              <button
+                onClick={function() {
+                  onDelete(todo.id);
+                }}
+                className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
+              >
+                削除
+              </button>
+              {/* 編集ボタン */}
+              <button
+                onClick={function() {
+                  onEdit(todo);
+                }}
+                className="bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-600 transition-colors"
+              >
+                編集
+              </button>
+            </div>
+          </li>
+        );
+      })}
     </ul>
   );
 }
 
 // 編集用のモーダルコンポーネント
-function EditModal({ todo, onSave, onClose }) {
+function EditModal(props) {
+  const todo = props.todo;
+  const onSave = props.onSave;
+  const onClose = props.onClose;
+
   // 編集中のTODOの状態を管理
-  const [editedTodo, setEditedTodo] = React.useState(todo);
+  const [editedTodo, setEditedTodo] = React.useState({
+    id: todo.id,
+    title: todo.title,
+    details: todo.details,
+    status: todo.status,
+    dueDate: todo.dueDate,
+    createdAt: todo.createdAt,
+    updatedAt: todo.updatedAt,
+  });
 
   // 保存ボタンをクリックしたときの処理
   const handleSave = () => {
-    onSave(editedTodo); // 変更を保存
-    onClose();          // モーダルを閉じる
+    onSave(todo.id, editedTodo); // 変更を保存
+    onClose();                   // モーダルを閉じる
   };
 
   return (
@@ -275,9 +366,17 @@ function EditModal({ todo, onSave, onClose }) {
         <input
           type="text"
           value={editedTodo.title}
-          onChange={(e) =>
-            setEditedTodo({ ...editedTodo, title: e.target.value })
-          }
+          onChange={function(e) {
+            setEditedTodo({
+              id: editedTodo.id,
+              title: e.target.value,
+              details: editedTodo.details,
+              status: editedTodo.status,
+              dueDate: editedTodo.dueDate,
+              createdAt: editedTodo.createdAt,
+              updatedAt: editedTodo.updatedAt,
+            });
+          }}
           className="border p-2 mb-2 w-full rounded"
           placeholder="タイトル"
           name="title"
@@ -286,18 +385,34 @@ function EditModal({ todo, onSave, onClose }) {
         <input
           type="date"
           value={editedTodo.dueDate || ""}
-          onChange={(e) =>
-            setEditedTodo({ ...editedTodo, dueDate: e.target.value })
-          }
+          onChange={function(e) {
+            setEditedTodo({
+              id: editedTodo.id,
+              title: editedTodo.title,
+              details: editedTodo.details,
+              status: editedTodo.status,
+              dueDate: e.target.value,
+              createdAt: editedTodo.createdAt,
+              updatedAt: editedTodo.updatedAt,
+            });
+          }}
           className="border p-2 mb-2 w-full rounded"
           name="dueDate"
         />
         {/* 詳細編集 */}
         <textarea
           value={editedTodo.details}
-          onChange={(e) =>
-            setEditedTodo({ ...editedTodo, details: e.target.value })
-          }
+          onChange={function(e) {
+            setEditedTodo({
+              id: editedTodo.id,
+              title: editedTodo.title,
+              details: e.target.value,
+              status: editedTodo.status,
+              dueDate: editedTodo.dueDate,
+              createdAt: editedTodo.createdAt,
+              updatedAt: editedTodo.updatedAt,
+            });
+          }}
           className="border p-2 mb-4 w-full rounded"
           placeholder="詳細"
           rows="3"
