@@ -7,7 +7,7 @@ import TodoForm from "./TodoForm";
 import FilterSortOptions from "./FilterSortOptions";
 import TodoList from "./TodoList";
 import EditModal from "./EditModal";
-import getStatusColor from "./getStatusColor";
+import getStatusColor from "../utils/getStatusColor";
 
 function MainComponent() {
   const [todos, setTodos] = React.useState([]);
