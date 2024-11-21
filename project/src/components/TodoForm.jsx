@@ -1,14 +1,15 @@
 //新しいTODOを追加するためのフォームコンポーネント
 // TodoForm.jsx
 import React from "react";
+import { TodoContext } from "../context/TodoContext";
 
-function TodoForm(props) {
-  const newTodo = props.newTodo;
-  const setNewTodo = props.setNewTodo;
-  const addTodo = props.addTodo;
+function TodoForm() {
+  // Contextから必要な値と関数を取得
+  const { newTodo, setNewTodo, addTodo } = React.useContext(TodoContext);
 
   return (
     <div className="mb-4">
+      {/* タイトル入力 */}
       <input
         type="text"
         value={newTodo.title}
@@ -22,6 +23,7 @@ function TodoForm(props) {
         className="border p-2 mr-2 rounded"
         name="title"
       />
+      {/* 詳細入力 */}
       <input
         type="text"
         value={newTodo.details}
@@ -35,6 +37,7 @@ function TodoForm(props) {
         className="border p-2 mr-2 rounded"
         name="details"
       />
+      {/* 期限日入力 */}
       <input
         type="date"
         value={newTodo.dueDate || ""}
@@ -47,6 +50,7 @@ function TodoForm(props) {
         className="border p-2 mr-2 rounded"
         name="dueDate"
       />
+      {/* ステータス選択 */}
       <select
         value={newTodo.status}
         onChange={function (e) {
@@ -62,6 +66,7 @@ function TodoForm(props) {
         <option value="進行中">進行中</option>
         <option value="完了">完了</option>
       </select>
+      {/* 追加ボタン */}
       <button
         onClick={addTodo}
         className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition-colors"

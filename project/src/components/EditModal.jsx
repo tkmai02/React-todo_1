@@ -1,23 +1,37 @@
 //TODOを編集するためのモーダルコンポーネント
 // EditModal.jsx
 import React from "react";
+import { TodoContext } from "../context/TodoContext";
 
-function EditModal(props) {
-  const todo = props.todo;
-  const onSave = props.onSave;
-  const onClose = props.onClose;
+function EditModal() {
+  const { editingTodo, editTodo, setEditingTodo } = React.useContext(TodoContext);
 
-  const [editedTodo, setEditedTodo] = React.useState({ ...todo });
+  // 編集中のTODOの状態を管理
+  const [editedTodo, setEditedTodo] = React.useState({ ...editingTodo });
 
+  // 保存ボタンをクリックしたときの処理
   const handleSave = () => {
-    onSave(todo.id, editedTodo);
-    onClose();
+    editTodo(editingTodo.id, editedTodo); // 変更を保存
+    setEditingTodo(null);                 // モーダルを閉じる
   };
 
+  // モーダルを閉じる処理
+  const handleClose = () => {
+    setEditingTodo(null);
+  };
+
+  // 編集中のTODOがない場合は何も表示しない
+  if (!editingTodo) {
+    return null;
+  }
+
   return (
+    // モーダルの背景
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      {/* モーダルの内容 */}
       <div className="bg-white p-6 rounded-lg w-96">
         <h2 className="text-2xl font-bold mb-4">TODO編集</h2>
+        {/* タイトル編集 */}
         <input
           type="text"
           value={editedTodo.title}
@@ -31,6 +45,7 @@ function EditModal(props) {
           placeholder="タイトル"
           name="title"
         />
+        {/* 期限日編集 */}
         <input
           type="date"
           value={editedTodo.dueDate || ""}
@@ -43,6 +58,7 @@ function EditModal(props) {
           className="border p-2 mb-2 w-full rounded"
           name="dueDate"
         />
+        {/* 詳細編集 */}
         <textarea
           value={editedTodo.details}
           onChange={function (e) {
@@ -56,13 +72,16 @@ function EditModal(props) {
           rows="3"
           name="details"
         ></textarea>
+        {/* ボタン群 */}
         <div className="flex justify-end space-x-2">
+          {/* キャンセルボタン */}
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400 transition-colors"
           >
             キャンセル
           </button>
+          {/* 保存ボタン */}
           <button
             onClick={handleSave}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"

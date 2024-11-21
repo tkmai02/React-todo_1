@@ -1,15 +1,15 @@
 //フィルターとソートのオプションを提供するコンポーネント
 // FilterSortOptions.jsx
 import React from "react";
+import { TodoContext } from "../context/TodoContext";
 
-function FilterSortOptions(props) {
-  const filter = props.filter;
-  const setFilter = props.setFilter;
-  const sortBy = props.sortBy;
-  const setSortBy = props.setSortBy;
+function FilterSortOptions() {
+  // Contextから必要な値と関数を取得
+  const { filter, setFilter, sortBy, setSortBy } = React.useContext(TodoContext);
 
   return (
     <div className="mb-4">
+      {/* フィルター選択 */}
       <select
         value={filter}
         onChange={function (e) {
@@ -23,6 +23,7 @@ function FilterSortOptions(props) {
         <option value="進行中">進行中</option>
         <option value="完了">完了</option>
       </select>
+      {/* ソート基準選択 */}
       <select
         value={sortBy}
         onChange={function (e) {

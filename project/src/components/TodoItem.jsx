@@ -1,17 +1,20 @@
 //個々のTODOアイテムを表示するコンポーネント
 // TodoItem.jsx
 import React from "react";
+import { TodoContext } from "../context/TodoContext";
+import getStatusColor from "../utils/getStatusColor";
 
 function TodoItem(props) {
+  const { deleteTodo, handleEdit } = React.useContext(TodoContext);
   const todo = props.todo;
-  const onDelete = props.onDelete;
-  const onEdit = props.onEdit;
-  const getStatusColor = props.getStatusColor;
 
   return (
     <li className="border p-4 rounded shadow">
+      {/* タイトル */}
       <h3 className="font-bold text-lg">{todo.title}</h3>
+      {/* 詳細 */}
       <p className="text-gray-600">{todo.details}</p>
+      {/* ステータス */}
       <p className="text-sm mt-2">
         ステータス:
         <span
@@ -23,29 +26,35 @@ function TodoItem(props) {
           {todo.status}
         </span>
       </p>
+      {/* 期限日 */}
       {todo.dueDate && (
         <p className="text-xs text-gray-500 mt-1">
           期限: {new Date(todo.dueDate).toLocaleDateString()}
         </p>
       )}
+      {/* 登録日 */}
       <p className="text-xs text-gray-500 mt-1">
         登録日: {new Date(todo.createdAt).toLocaleString()}
       </p>
+      {/* 更新日 */}
       <p className="text-xs text-gray-500">
         更新日: {new Date(todo.updatedAt).toLocaleString()}
       </p>
+      {/* 操作ボタン */}
       <div className="mt-2 space-x-2">
+        {/* 削除ボタン */}
         <button
           onClick={function () {
-            onDelete(todo.id);
+            deleteTodo(todo.id);
           }}
           className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
         >
           削除
         </button>
+        {/* 編集ボタン */}
         <button
           onClick={function () {
-            onEdit(todo);
+            handleEdit(todo);
           }}
           className="bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-600 transition-colors"
         >
@@ -57,4 +66,3 @@ function TodoItem(props) {
 }
 
 export default TodoItem;
-

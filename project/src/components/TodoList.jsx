@@ -1,26 +1,17 @@
 //TODOリストを表示するコンポーネント
-//TodoList.jsx
+// TodoList.jsx
 import React from "react";
+import { TodoContext } from "../context/TodoContext";
 import TodoItem from "./TodoItem";
 
-function TodoList(props) {
-  const todos = props.todos;
-  const onDelete = props.onDelete;
-  const onEdit = props.onEdit;
-  const getStatusColor = props.getStatusColor;
+function TodoList() {
+  // ContextからフィルタリングされたTODOリストを取得
+  const { filteredTodos } = React.useContext(TodoContext);
 
   return (
     <ul className="space-y-4">
-      {todos.map(function (todo) {
-        return (
-          <TodoItem
-            key={todo.id}
-            todo={todo}
-            onDelete={onDelete}
-            onEdit={onEdit}
-            getStatusColor={getStatusColor}
-          />
-        );
+      {filteredTodos.map(function (todo) {
+        return <TodoItem key={todo.id} todo={todo} />;
       })}
     </ul>
   );
