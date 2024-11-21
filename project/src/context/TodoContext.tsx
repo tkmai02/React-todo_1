@@ -1,10 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
-
-// Supabaseの設定
-const supabaseUrl = "https://your-supabase-url.supabase.co";
-const supabaseKey = "your-supabase-anon-key";
-const supabase = createClient(supabaseUrl, supabaseKey);
+import supabase from "../supabase";
 
 // Contextを作成
 const TodoContext = createContext<any>(null);
