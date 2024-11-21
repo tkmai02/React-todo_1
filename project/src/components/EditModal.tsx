@@ -1,18 +1,18 @@
 //TODOを編集するためのモーダルコンポーネント
-// EditModal.jsx
+// EditModal.tsx
 import React from "react";
 import { TodoContext } from "../context/TodoContext";
 
 function EditModal() {
-  const { editingTodo, editTodo, setEditingTodo } = React.useContext(TodoContext);
+  const { editingTodo, editTodo, setEditingTodo } = React.useContext<any>(TodoContext);
 
   // 編集中のTODOの状態を管理
-  const [editedTodo, setEditedTodo] = React.useState({ ...editingTodo });
+  const [editedTodo, setEditedTodo] = React.useState<any>({ ...editingTodo });
 
   // 保存ボタンをクリックしたときの処理
   const handleSave = () => {
     editTodo(editingTodo.id, editedTodo); // 変更を保存
-    setEditingTodo(null);                 // モーダルを閉じる
+    setEditingTodo(null); // モーダルを閉じる
   };
 
   // モーダルを閉じる処理
@@ -69,7 +69,7 @@ function EditModal() {
           }}
           className="border p-2 mb-4 w-full rounded"
           placeholder="詳細"
-          rows="3"
+          rows={3}
           name="details"
         ></textarea>
         {/* ボタン群 */}

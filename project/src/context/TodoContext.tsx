@@ -1,28 +1,39 @@
-// TodoContext.jsx
-import React from "react";
+// TodoContext.tsx
+import React, { createContext, useState } from "react";
 
 // Contextを作成
-const TodoContext = React.createContext();
+const TodoContext = createContext<any>(null);
+
+// Todoアイテムの型定義
+interface TodoItem {
+  id: number;
+  title: string;
+  details: string;
+  status: string;
+  dueDate: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 // プロバイダーコンポーネントを定義
-function TodoProvider(props) {
+function TodoProvider(props: any) {
   // 状態を定義
-  const [todos, setTodos] = React.useState([]);
-  const [newTodo, setNewTodo] = React.useState({
+  const [todos, setTodos] = useState<TodoItem[]>([]);
+  const [newTodo, setNewTodo] = useState<any>({
     title: "",
     details: "",
     status: "未着手",
     dueDate: "",
   });
-  const [filter, setFilter] = React.useState("全て");
-  const [sortBy, setSortBy] = React.useState("登録日");
-  const [editingTodo, setEditingTodo] = React.useState(null);
+  const [filter, setFilter] = useState<string>("全て");
+  const [sortBy, setSortBy] = useState<string>("登録日");
+  const [editingTodo, setEditingTodo] = useState<TodoItem | null>(null);
 
   // 新しいTODOを追加する関数
   const addTodo = () => {
     if (newTodo.title) {
       const currentDate = new Date().toISOString();
-      const newTodoItem = {
+      const newTodoItem: TodoItem = {
         id: Date.now(),
         title: newTodo.title,
         details: newTodo.details,
@@ -42,7 +53,7 @@ function TodoProvider(props) {
   };
 
   // TODOを削除する関数
-  const deleteTodo = (id) => {
+  const deleteTodo = (id: number) => {
     const updatedTodos = todos.filter(function (todo) {
       return todo.id !== id;
     });
@@ -50,7 +61,7 @@ function TodoProvider(props) {
   };
 
   // TODOを編集する関数
-  const editTodo = (id, updatedTodo) => {
+  const editTodo = (id: number, updatedTodo: any) => {
     const updatedTodos = todos.map(function (todo) {
       if (todo.id === id) {
         return {
@@ -67,16 +78,16 @@ function TodoProvider(props) {
   };
 
   // 編集モードを設定する関数
-  const handleEdit = (todo) => {
+  const handleEdit = (todo: TodoItem) => {
     setEditingTodo(todo);
   };
 
   // ソートとフィルタリング
   const sortedTodos = todos.slice().sort(function (a, b) {
     if (sortBy === "登録日") {
-      return new Date(a.createdAt) - new Date(b.createdAt);
+      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
     } else {
-      return new Date(a.updatedAt) - new Date(b.updatedAt);
+      return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
     }
   });
 

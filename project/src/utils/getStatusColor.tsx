@@ -1,6 +1,6 @@
 //ステータスに応じた色を取得する関数を含むユーティリティファイル
-// getStatusColor.js
-function getStatusColor(status) {
+// getStatusColor.tsx
+function getStatusColor(status: string): string {
   switch (status) {
     case "未着手":
       return "bg-red-100 text-red-800";

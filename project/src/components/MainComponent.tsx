@@ -1,5 +1,5 @@
 //アプリケーションのメインコンポーネント
-// MainComponent.jsx
+// MainComponent.tsx
 "use client";
 
 import React from "react";
@@ -27,3 +27,4 @@ function MainComponent() {
 }
 
 export default MainComponent;
+

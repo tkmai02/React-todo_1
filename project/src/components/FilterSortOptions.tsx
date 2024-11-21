@@ -1,11 +1,11 @@
 //フィルターとソートのオプションを提供するコンポーネント
-// FilterSortOptions.jsx
+// FilterSortOptions.tsx
 import React from "react";
 import { TodoContext } from "../context/TodoContext";
 
 function FilterSortOptions() {
   // Contextから必要な値と関数を取得
-  const { filter, setFilter, sortBy, setSortBy } = React.useContext(TodoContext);
+  const { filter, setFilter, sortBy, setSortBy } = React.useContext<any>(TodoContext);
 
   return (
     <div className="mb-4">

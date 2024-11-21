@@ -1,11 +1,11 @@
 //個々のTODOアイテムを表示するコンポーネント
-// TodoItem.jsx
+// TodoItem.tsx
 import React from "react";
 import { TodoContext } from "../context/TodoContext";
 import getStatusColor from "../utils/getStatusColor";
 
-function TodoItem(props) {
-  const { deleteTodo, handleEdit } = React.useContext(TodoContext);
+function TodoItem(props: any) {
+  const { deleteTodo, handleEdit } = React.useContext<any>(TodoContext);
   const todo = props.todo;
 
   return (

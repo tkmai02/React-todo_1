@@ -1,11 +1,11 @@
 //新しいTODOを追加するためのフォームコンポーネント
-// TodoForm.jsx
+// TodoForm.tsx
 import React from "react";
 import { TodoContext } from "../context/TodoContext";
 
 function TodoForm() {
   // Contextから必要な値と関数を取得
-  const { newTodo, setNewTodo, addTodo } = React.useContext(TodoContext);
+  const { newTodo, setNewTodo, addTodo } = React.useContext<any>(TodoContext);
 
   return (
     <div className="mb-4">
