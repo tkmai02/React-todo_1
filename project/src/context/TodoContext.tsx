@@ -25,7 +25,7 @@ function TodoProvider(props: any) {
 
   // データをSupabaseから取得
   const fetchTodos = async () => {
-    const { data, error } = await supabase.from("todo-pj").select("*");
+    const { data, error } = await supabase.from("todo-pj-table").select("*");
     if (error) {
       console.error("Error fetching todos:", error);
     } else {
@@ -35,7 +35,7 @@ function TodoProvider(props: any) {
 
   // 新しいTODOを追加
   const addTodo = async () => {
-    const { data, error } = await supabase.from("todo-pj").insert([newTodo]);
+    const { data, error } = await supabase.from("todo-pj-table").insert([newTodo]);
     if (error) {
       console.error("Error adding todo:", error);
     } else {
@@ -45,7 +45,7 @@ function TodoProvider(props: any) {
 
   // TODOを削除
   const deleteTodo = async (id: string) => {
-    const { error } = await supabase.from("todo-pj").delete().eq("id", id);
+    const { error } = await supabase.from("todo-pj-table").delete().eq("id", id);
     if (error) {
       console.error("Error deleting todo:", error);
     } else {
