@@ -1,12 +1,12 @@
 // TodoContext.tsx
-import React, { createContext, useState } from "react";
+import React, { createContext, useState, useEffect } from "react";
+import supabase from "../supabase.js";
 
 // Contextを作成
 const TodoContext = createContext<any>(null);
 
-// Todoアイテムの型定義
 interface TodoItem {
-  id: number;
+  id: string;
   title: string;
   details: string;
   status: string;
@@ -15,83 +15,93 @@ interface TodoItem {
   updatedAt: string;
 }
 
-// プロバイダーコンポーネントを定義
 function TodoProvider(props: any) {
-  // 状態を定義
   const [todos, setTodos] = useState<TodoItem[]>([]);
-  const [newTodo, setNewTodo] = useState<any>({
+  const [newTodo, setNewTodo] = useState({
     title: "",
     details: "",
     status: "未着手",
     dueDate: "",
   });
-  const [filter, setFilter] = useState<string>("全て");
-  const [sortBy, setSortBy] = useState<string>("登録日");
+
+  const [filter, setFilter] = useState("全て");
+  const [sortBy, setSortBy] = useState("登録日");
   const [editingTodo, setEditingTodo] = useState<TodoItem | null>(null);
 
-  // 新しいTODOを追加する関数
-  const addTodo = () => {
-    if (newTodo.title) {
-      const currentDate = new Date().toISOString();
-      const newTodoItem: TodoItem = {
-        id: Date.now(),
-        title: newTodo.title,
-        details: newTodo.details,
-        status: newTodo.status,
-        dueDate: newTodo.dueDate,
-        createdAt: currentDate,
-        updatedAt: currentDate,
-      };
-      setTodos(todos.concat(newTodoItem));
+  // データをSupabaseから取得
+  const fetchTodos = async () => {
+    const { data, error } = await supabase.from("todo-pj-table").select("*");
+    if (error) {
+      console.error("Error fetching todos:", error);
+    } else {
+      setTodos(data || []);
+    }
+  };
+
+  // 新しいTODOを追加
+  const addTodo = async () => {
+    // 送信用のデータを準備
+    const todoToSubmit = {
+      ...newTodo,
+      // dueDateが空文字列の場合はnullを設定
+      dueDate: newTodo.dueDate === "" ? null : newTodo.dueDate
+    };
+
+    const { data, error } = await supabase
+      .from("todo-pj-table")
+      .insert([todoToSubmit]);
+
+    if (error) {
+      console.error("Error adding todo:", error);
+    } else {
+      setTodos((prev) => [...prev, ...data]);
+      // 入力フィールドをクリア
       setNewTodo({
         title: "",
         details: "",
         status: "未着手",
-        dueDate: "",
+        dueDate: null,
       });
     }
   };
 
-  // TODOを削除する関数
-  const deleteTodo = (id: number) => {
-    const updatedTodos = todos.filter(function (todo) {
-      return todo.id !== id;
-    });
-    setTodos(updatedTodos);
+  // TODOを削除
+  const deleteTodo = async (id: string) => {
+    const { error } = await supabase.from("todo-pj-table").delete().eq("id", id);
+    if (error) {
+      console.error("Error deleting todo:", error);
+    } else {
+      setTodos((prev) => prev.filter((todo) => todo.id !== id));
+    }
   };
 
-  // TODOを編集する関数
-  const editTodo = (id: number, updatedTodo: any) => {
-    const updatedTodos = todos.map(function (todo) {
-      if (todo.id === id) {
-        return {
-          ...todo,
-          ...updatedTodo,
-          updatedAt: new Date().toISOString(),
-        };
-      } else {
-        return todo;
-      }
-    });
-    setTodos(updatedTodos);
-    setEditingTodo(null);
+  // TODOを編集
+  const editTodo = async (id: string, updatedFields: Partial<TodoItem>) => {
+    const { data, error } = await supabase
+      .from("todo-pj-table")
+      .update(updatedFields)
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error updating todo:", error);
+    } else {
+      setTodos((prev) =>
+        prev.map((todo) => (todo.id === id ? { ...todo, ...updatedFields } : todo))
+      );
+    }
   };
 
-  // 編集モードを設定する関数
+  // 編集モードに入る
   const handleEdit = (todo: TodoItem) => {
     setEditingTodo(todo);
   };
 
-  // ソートとフィルタリング
-  const sortedTodos = todos.slice().sort(function (a, b) {
-    if (sortBy === "登録日") {
-      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-    } else {
-      return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
-    }
-  });
+  useEffect(() => {
+    fetchTodos();
+  }, []);
 
-  const filteredTodos = sortedTodos.filter(function (todo) {
+  // フィルタリングされたTODOリスト
+  const filteredTodos = todos.filter((todo) => {
     if (filter === "全て") {
       return true;
     } else {
@@ -99,28 +109,35 @@ function TodoProvider(props: any) {
     }
   });
 
-  // Contextに提供する値
-  const contextValue = {
-    todos,
-    setTodos,
-    newTodo,
-    setNewTodo,
-    filter,
-    setFilter,
-    sortBy,
-    setSortBy,
-    editingTodo,
-    setEditingTodo,
-    addTodo,
-    deleteTodo,
-    editTodo,
-    handleEdit,
-    filteredTodos,
-  };
+  // ソート
+  filteredTodos.sort((a, b) => {
+    if (sortBy === "登録日") {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    } else if (sortBy === "更新日") {
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    }
+    return 0;
+  });
 
-  // 子コンポーネントにContextを提供
   return (
-    <TodoContext.Provider value={contextValue}>
+    <TodoContext.Provider
+      value={{
+        todos,
+        filteredTodos,
+        newTodo,
+        setNewTodo,
+        addTodo,
+        deleteTodo,
+        editTodo,
+        editingTodo,
+        setEditingTodo,
+        handleEdit,
+        filter,
+        setFilter,
+        sortBy,
+        setSortBy,
+      }}
+    >
       {props.children}
     </TodoContext.Provider>
   );

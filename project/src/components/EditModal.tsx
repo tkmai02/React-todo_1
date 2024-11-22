@@ -1,6 +1,6 @@
 //TODOを編集するためのモーダルコンポーネント
 // EditModal.tsx
-import React from "react";
+import React, { useEffect } from "react";
 import { TodoContext } from "../context/TodoContext";
 
 function EditModal() {
@@ -8,6 +8,10 @@ function EditModal() {
 
   // 編集中のTODOの状態を管理
   const [editedTodo, setEditedTodo] = React.useState<any>({ ...editingTodo });
+
+  useEffect(() => {
+    setEditedTodo({ ...editingTodo });
+  }, [editingTodo]);
 
   // 保存ボタンをクリックしたときの処理
   const handleSave = () => {
@@ -72,6 +76,22 @@ function EditModal() {
           rows={3}
           name="details"
         ></textarea>
+        {/* ステータス編集 */}
+        <select
+          value={editedTodo.status}
+          onChange={function (e) {
+            setEditedTodo({
+              ...editedTodo,
+              status: e.target.value,
+            });
+          }}
+          className="border p-2 mb-4 w-full rounded"
+          name="status"
+        >
+          <option value="未着手">未着手</option>
+          <option value="進行中">進行中</option>
+          <option value="完了">完了</option>
+        </select>
         {/* ボタン群 */}
         <div className="flex justify-end space-x-2">
           {/* キャンセルボタン */}
