@@ -44,12 +44,14 @@ function TodoProvider(props: any) {
     const todoToSubmit = {
       ...newTodo,
       // dueDateが空文字列の場合はnullを設定
-      dueDate: newTodo.dueDate === "" ? null : newTodo.dueDate
+      dueDate: newTodo.dueDate === "" ? null : newTodo.dueDate,
+      // createdAtに現在の日時を設定
+      createdAt: new Date().toISOString()
     };
-
     const { data, error } = await supabase
       .from("todo-pj-table")
-      .insert([todoToSubmit]);
+      .insert([todoToSubmit])
+      .select('*'); // ここで挿入されたデータを取得
 
     if (error) {
       console.error("Error adding todo:", error);
