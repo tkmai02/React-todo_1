@@ -42,7 +42,7 @@ interface TodoContextType {
 // コンテキストを作成
 const TodoContext = createContext<TodoContextType | undefined>(undefined);
 
-function TodoProvider(props: { children: React.ReactNode }) {
+const TodoProvider = (props: { children: React.ReactNode }) => {
   const [todos, setTodos] = useState<TodoItem[]>([]);
   const [newTodo, setNewTodo] = useState<NewTodo>({
     title: "",
@@ -54,6 +54,7 @@ function TodoProvider(props: { children: React.ReactNode }) {
   const [filter, setFilter] = useState<string>("全て");
   const [sortBy, setSortBy] = useState<string>("登録日");
   const [editingTodo, setEditingTodo] = useState<TodoItem | null>(null);
+
   // データをSupabaseから取得
   const fetchTodos = async () => {
     const { data, error } = await supabase.from("todo-pj-table").select("*");
@@ -158,6 +159,6 @@ function TodoProvider(props: { children: React.ReactNode }) {
       {props.children}
     </TodoContext.Provider>
   );
-}
+};
 
 export { TodoContext, TodoProvider };

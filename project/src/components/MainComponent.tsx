@@ -9,7 +9,7 @@ import FilterSortOptions from "./FilterSortOptions";
 import TodoList from "./TodoList";
 import EditModal from "./EditModal";
 
-function MainComponent() {
+const MainComponent = () => {
   return (
     // TodoProviderでアプリ全体をラップ
     <TodoProvider>
@@ -24,6 +24,6 @@ function MainComponent() {
       </div>
     </TodoProvider>
   );
-}
+};
 
 export default MainComponent;

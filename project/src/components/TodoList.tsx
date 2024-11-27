@@ -4,7 +4,7 @@ import React from "react";
 import TodoItem from "./TodoItem";
 import { TodoContext } from "../context/TodoContext";
 
-function TodoList() {
+const TodoList = () => {
   const context = React.useContext(TodoContext);
 
   if (!context) {
@@ -16,11 +16,11 @@ function TodoList() {
   return (
     <ul className="space-y-4">
       {Array.isArray(filteredTodos) &&
-        filteredTodos.map(function (todo) {
+        filteredTodos.map((todo) => {
           return <TodoItem key={todo.id} todo={todo} />;
         })}
     </ul>
   );
-}
+};
 
 export default TodoList;

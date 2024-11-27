@@ -8,7 +8,7 @@ interface TodoItemProps {
   todo: TodoItemType;
 }
 
-function TodoItem(props: TodoItemProps) {
+const TodoItem: React.FC<TodoItemProps> = (props) => {
   const context = React.useContext(TodoContext);
 
   if (!context) {
@@ -54,7 +54,7 @@ function TodoItem(props: TodoItemProps) {
       <div className="mt-2 space-x-2">
         {/* 削除ボタン */}
         <button
-          onClick={function () {
+          onClick={() => {
             deleteTodo(todo.id);
           }}
           className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
@@ -63,7 +63,7 @@ function TodoItem(props: TodoItemProps) {
         </button>
         {/* 編集ボタン */}
         <button
-          onClick={function () {
+          onClick={() => {
             handleEdit(todo);
           }}
           className="bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-600 transition-colors"
@@ -73,6 +73,6 @@ function TodoItem(props: TodoItemProps) {
       </div>
     </li>
   );
-}
+};
 
 export default TodoItem;
