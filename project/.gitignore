@@ -38,3 +38,6 @@ next-env.d.ts
 # local env files
 .env
 .env*.local
+
+#firebase
+.firebase/tec-support-pj/
