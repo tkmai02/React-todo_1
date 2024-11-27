@@ -1,5 +1,6 @@
 import { Inter } from 'next/font/google'
 import './globals.css'
+import { ReactNode } from 'react' // ReactNodeをインポート
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -8,7 +9,11 @@ export const metadata = {
   description: 'Todo App by Next.js',
 }
 
-export default function RootLayout({ children }) {
+interface RootLayoutProps {
+  children: ReactNode
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
       <body className={inter.className}>{children}</body>
