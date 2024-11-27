@@ -13,6 +13,20 @@ function TodoForm() {
 
   const { newTodo, setNewTodo, addTodo } = context;
 
+    // バリデーションエラーを管理するための状態を追加
+  const [errors, setErrors] = React.useState<{ dueDate?: string }>({});
+  // 追加ボタンがクリックされたときのハンドラー
+  const handleAddTodo = () => {
+  // dueDateが未入力の場合、エラーメッセージを設定
+  if (!newTodo.dueDate) {
+  setErrors({ dueDate: "タスクの実行期限日を入力してください。" });
+  return;
+  }
+  // エラーをクリアしてTodoを追加
+  setErrors({});
+  addTodo();
+  };
+
   return (
     <div className="mb-4">
       {/* タイトル入力 */}
@@ -56,6 +70,10 @@ function TodoForm() {
         className="border p-2 mr-2 rounded"
         name="dueDate"
       />
+      {/* バリデーションエラーメッセージを表示 */}
+      {errors.dueDate && (
+      <div className="text-red-500 mt-1">{errors.dueDate}</div>
+      )}
       {/* ステータス選択 */}
       <select
         value={newTodo.status}
@@ -74,7 +92,7 @@ function TodoForm() {
       </select>
       {/* 追加ボタン */}
       <button
-        onClick={addTodo}
+        onClick={handleAddTodo}
         className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition-colors"
       >
         追加

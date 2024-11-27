@@ -54,7 +54,6 @@ function TodoProvider(props: { children: React.ReactNode }) {
   const [filter, setFilter] = useState<string>("全て");
   const [sortBy, setSortBy] = useState<string>("登録日");
   const [editingTodo, setEditingTodo] = useState<TodoItem | null>(null);
-
   // データをSupabaseから取得
   const fetchTodos = async () => {
     const { data, error } = await supabase.from("todo-pj-table").select("*");
@@ -67,11 +66,12 @@ function TodoProvider(props: { children: React.ReactNode }) {
 
   // 新しいTODOを追加
   const addTodo = async () => {
-    const { data, error } = await supabase.from("todo-pj-table").insert([newTodo]);
+    const { error } = await supabase.from("todo-pj-table").insert([newTodo]);
     if (error) {
       console.error("Error adding todo:", error);
     } else {
-      setTodos((prev) => [...prev, ...(data || [])]);
+      // 最新のTODOリストを取得
+      await fetchTodos();
       // 入力フィールドをクリア
       setNewTodo({
         title: "",
