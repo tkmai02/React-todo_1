@@ -2,10 +2,12 @@
 
 import MainComponent from "../components/MainComponent";
 
-export default function Page() {
+const Page = () => {
   return (
     <div>
       <MainComponent />
     </div>
   );
-}
+};
+
+export default Page;

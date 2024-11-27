@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { TodoContext, TodoItem } from "../context/TodoContext";
 
-function EditModal() {
+const EditModal = () => {
   const context = React.useContext(TodoContext);
 
   if (!context) {
@@ -49,7 +49,7 @@ function EditModal() {
         <input
           type="text"
           value={editedTodo.title}
-          onChange={function (e: React.ChangeEvent<HTMLInputElement>) {
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setEditedTodo({
               ...editedTodo,
               title: e.target.value,
@@ -63,7 +63,7 @@ function EditModal() {
         <input
           type="date"
           value={editedTodo.dueDate || ""}
-          onChange={function (e: React.ChangeEvent<HTMLInputElement>) {
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setEditedTodo({
               ...editedTodo,
               dueDate: e.target.value,
@@ -75,7 +75,7 @@ function EditModal() {
         {/* 詳細編集 */}
         <textarea
           value={editedTodo.details}
-          onChange={function (e: React.ChangeEvent<HTMLTextAreaElement>) {
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
             setEditedTodo({
               ...editedTodo,
               details: e.target.value,
@@ -89,7 +89,7 @@ function EditModal() {
         {/* ステータス編集 */}
         <select
           value={editedTodo.status}
-          onChange={function (e: React.ChangeEvent<HTMLSelectElement>) {
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
             setEditedTodo({
               ...editedTodo,
               status: e.target.value,
@@ -122,6 +122,6 @@ function EditModal() {
       </div>
     </div>
   );
-}
+};
 
 export default EditModal;

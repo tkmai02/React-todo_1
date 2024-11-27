@@ -3,7 +3,7 @@
 import React from "react";
 import { TodoContext } from "../context/TodoContext";
 
-function TodoForm() {
+const TodoForm = () => {
   // Contextから必要な値と関数を取得
   const context = React.useContext(TodoContext);
 
@@ -13,18 +13,18 @@ function TodoForm() {
 
   const { newTodo, setNewTodo, addTodo } = context;
 
-    // バリデーションエラーを管理するための状態を追加
+  // バリデーションエラーを管理するための状態を追加
   const [errors, setErrors] = React.useState<{ dueDate?: string }>({});
   // 追加ボタンがクリックされたときのハンドラー
   const handleAddTodo = () => {
-  // dueDateが未入力の場合、エラーメッセージを設定
-  if (!newTodo.dueDate) {
-  setErrors({ dueDate: "タスクの実行期限日を入力してください。" });
-  return;
-  }
-  // エラーをクリアしてTodoを追加
-  setErrors({});
-  addTodo();
+    // dueDateが未入力の場合、エラーメッセージを設定
+    if (!newTodo.dueDate) {
+      setErrors({ dueDate: "タスクの実行期限日を入力してください。" });
+      return;
+    }
+    // エラーをクリアしてTodoを追加
+    setErrors({});
+    addTodo();
   };
 
   return (
@@ -33,7 +33,7 @@ function TodoForm() {
       <input
         type="text"
         value={newTodo.title}
-        onChange={function (e: React.ChangeEvent<HTMLInputElement>) {
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
           setNewTodo({
             ...newTodo,
             title: e.target.value,
@@ -47,7 +47,7 @@ function TodoForm() {
       <input
         type="text"
         value={newTodo.details}
-        onChange={function (e: React.ChangeEvent<HTMLInputElement>) {
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
           setNewTodo({
             ...newTodo,
             details: e.target.value,
@@ -61,7 +61,7 @@ function TodoForm() {
       <input
         type="date"
         value={newTodo.dueDate || ""}
-        onChange={function (e: React.ChangeEvent<HTMLInputElement>) {
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
           setNewTodo({
             ...newTodo,
             dueDate: e.target.value,
@@ -72,12 +72,12 @@ function TodoForm() {
       />
       {/* バリデーションエラーメッセージを表示 */}
       {errors.dueDate && (
-      <div className="text-red-500 mt-1">{errors.dueDate}</div>
+        <div className="text-red-500 mt-1">{errors.dueDate}</div>
       )}
       {/* ステータス選択 */}
       <select
         value={newTodo.status}
-        onChange={function (e: React.ChangeEvent<HTMLSelectElement>) {
+        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
           setNewTodo({
             ...newTodo,
             status: e.target.value,

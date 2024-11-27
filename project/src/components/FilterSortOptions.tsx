@@ -3,7 +3,7 @@
 import React from "react";
 import { TodoContext } from "../context/TodoContext";
 
-function FilterSortOptions() {
+const FilterSortOptions = () => {
   // Contextから必要な値と関数を取得
   const context = React.useContext(TodoContext);
 
@@ -18,7 +18,7 @@ function FilterSortOptions() {
       {/* フィルター選択 */}
       <select
         value={filter}
-        onChange={function (e: React.ChangeEvent<HTMLSelectElement>) {
+        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
           setFilter(e.target.value);
         }}
         className="border p-2 mr-2 rounded"
@@ -32,7 +32,7 @@ function FilterSortOptions() {
       {/* ソート基準選択 */}
       <select
         value={sortBy}
-        onChange={function (e: React.ChangeEvent<HTMLSelectElement>) {
+        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
           setSortBy(e.target.value);
         }}
         className="border p-2 rounded"
@@ -43,6 +43,6 @@ function FilterSortOptions() {
       </select>
     </div>
   );
-}
+};
 
 export default FilterSortOptions;
