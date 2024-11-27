@@ -1,12 +1,22 @@
 //個々のTODOアイテムを表示するコンポーネント
 // TodoItem.tsx
 import React from "react";
-import { TodoContext } from "../context/TodoContext";
+import { TodoContext, TodoItem as TodoItemType } from "../context/TodoContext";
 import getStatusColor from "../utils/getStatusColor";
 
-function TodoItem(props: any) {
-  const { deleteTodo, handleEdit } = React.useContext<any>(TodoContext);
-  const todo = props.todo;
+interface TodoItemProps {
+  todo: TodoItemType;
+}
+
+function TodoItem(props: TodoItemProps) {
+  const context = React.useContext(TodoContext);
+
+  if (!context) {
+    throw new Error("TodoItem must be used within a TodoProvider");
+  }
+
+  const { deleteTodo, handleEdit } = context;
+  const { todo } = props;
 
   return (
     <li className="border p-4 rounded shadow">

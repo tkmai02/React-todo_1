@@ -2,10 +2,8 @@
 import React, { createContext, useState, useEffect } from "react";
 import supabase from "../supabase.js";
 
-// Contextを作成
-const TodoContext = createContext<any>(null);
-
-interface TodoItem {
+// Todoアイテムの型定義
+export interface TodoItem {
   id: string;
   title: string;
   details: string;
@@ -15,17 +13,46 @@ interface TodoItem {
   updatedAt: string;
 }
 
-function TodoProvider(props: any) {
+// 新規Todoの型定義
+interface NewTodo {
+  title: string;
+  details: string;
+  status: string;
+  dueDate: string;
+}
+
+// コンテキストの値の型定義
+interface TodoContextType {
+  todos: TodoItem[];
+  filteredTodos: TodoItem[];
+  newTodo: NewTodo;
+  setNewTodo: React.Dispatch<React.SetStateAction<NewTodo>>;
+  addTodo: () => Promise<void>;
+  deleteTodo: (id: string) => Promise<void>;
+  editTodo: (id: string, updatedFields: Partial<TodoItem>) => Promise<void>;
+  editingTodo: TodoItem | null;
+  setEditingTodo: React.Dispatch<React.SetStateAction<TodoItem | null>>;
+  handleEdit: (todo: TodoItem) => void;
+  filter: string;
+  setFilter: React.Dispatch<React.SetStateAction<string>>;
+  sortBy: string;
+  setSortBy: React.Dispatch<React.SetStateAction<string>>;
+}
+
+// コンテキストを作成
+const TodoContext = createContext<TodoContextType | undefined>(undefined);
+
+function TodoProvider(props: { children: React.ReactNode }) {
   const [todos, setTodos] = useState<TodoItem[]>([]);
-  const [newTodo, setNewTodo] = useState({
+  const [newTodo, setNewTodo] = useState<NewTodo>({
     title: "",
     details: "",
     status: "未着手",
     dueDate: "",
   });
 
-  const [filter, setFilter] = useState("全て");
-  const [sortBy, setSortBy] = useState("登録日");
+  const [filter, setFilter] = useState<string>("全て");
+  const [sortBy, setSortBy] = useState<string>("登録日");
   const [editingTodo, setEditingTodo] = useState<TodoItem | null>(null);
 
   // データをSupabaseから取得
@@ -40,29 +67,17 @@ function TodoProvider(props: any) {
 
   // 新しいTODOを追加
   const addTodo = async () => {
-    // 送信用のデータを準備
-    const todoToSubmit = {
-      ...newTodo,
-      // dueDateが空文字列の場合はnullを設定
-      dueDate: newTodo.dueDate === "" ? null : newTodo.dueDate,
-      // createdAtに現在の日時を設定
-      createdAt: new Date().toISOString()
-    };
-    const { data, error } = await supabase
-      .from("todo-pj-table")
-      .insert([todoToSubmit])
-      .select('*'); // ここで挿入されたデータを取得
-
+    const { data, error } = await supabase.from("todo-pj-table").insert([newTodo]);
     if (error) {
       console.error("Error adding todo:", error);
     } else {
-      setTodos((prev) => [...prev, ...data]);
+      setTodos((prev) => [...prev, ...(data || [])]);
       // 入力フィールドをクリア
       setNewTodo({
         title: "",
         details: "",
         status: "未着手",
-        dueDate: null,
+        dueDate: "",
       });
     }
   };

@@ -1,22 +1,32 @@
 //TODOを編集するためのモーダルコンポーネント
 // EditModal.tsx
 import React, { useEffect } from "react";
-import { TodoContext } from "../context/TodoContext";
+import { TodoContext, TodoItem } from "../context/TodoContext";
 
 function EditModal() {
-  const { editingTodo, editTodo, setEditingTodo } = React.useContext<any>(TodoContext);
+  const context = React.useContext(TodoContext);
+
+  if (!context) {
+    throw new Error("EditModal must be used within a TodoProvider");
+  }
+
+  const { editingTodo, editTodo, setEditingTodo } = context;
 
   // 編集中のTODOの状態を管理
-  const [editedTodo, setEditedTodo] = React.useState<any>({ ...editingTodo });
+  const [editedTodo, setEditedTodo] = React.useState<TodoItem | null>(
+    editingTodo ? { ...editingTodo } : null
+  );
 
   useEffect(() => {
-    setEditedTodo({ ...editingTodo });
+    setEditedTodo(editingTodo ? { ...editingTodo } : null);
   }, [editingTodo]);
 
   // 保存ボタンをクリックしたときの処理
   const handleSave = () => {
-    editTodo(editingTodo.id, editedTodo); // 変更を保存
-    setEditingTodo(null); // モーダルを閉じる
+    if (editingTodo && editedTodo) {
+      editTodo(editingTodo.id, editedTodo); // 変更を保存
+      setEditingTodo(null); // モーダルを閉じる
+    }
   };
 
   // モーダルを閉じる処理
@@ -25,7 +35,7 @@ function EditModal() {
   };
 
   // 編集中のTODOがない場合は何も表示しない
-  if (!editingTodo) {
+  if (!editingTodo || !editedTodo) {
     return null;
   }
 
@@ -39,7 +49,7 @@ function EditModal() {
         <input
           type="text"
           value={editedTodo.title}
-          onChange={function (e) {
+          onChange={function (e: React.ChangeEvent<HTMLInputElement>) {
             setEditedTodo({
               ...editedTodo,
               title: e.target.value,
@@ -53,7 +63,7 @@ function EditModal() {
         <input
           type="date"
           value={editedTodo.dueDate || ""}
-          onChange={function (e) {
+          onChange={function (e: React.ChangeEvent<HTMLInputElement>) {
             setEditedTodo({
               ...editedTodo,
               dueDate: e.target.value,
@@ -65,7 +75,7 @@ function EditModal() {
         {/* 詳細編集 */}
         <textarea
           value={editedTodo.details}
-          onChange={function (e) {
+          onChange={function (e: React.ChangeEvent<HTMLTextAreaElement>) {
             setEditedTodo({
               ...editedTodo,
               details: e.target.value,
@@ -79,7 +89,7 @@ function EditModal() {
         {/* ステータス編集 */}
         <select
           value={editedTodo.status}
-          onChange={function (e) {
+          onChange={function (e: React.ChangeEvent<HTMLSelectElement>) {
             setEditedTodo({
               ...editedTodo,
               status: e.target.value,

@@ -5,14 +5,20 @@ import { TodoContext } from "../context/TodoContext";
 
 function FilterSortOptions() {
   // Contextから必要な値と関数を取得
-  const { filter, setFilter, sortBy, setSortBy } = React.useContext<any>(TodoContext);
+  const context = React.useContext(TodoContext);
+
+  if (!context) {
+    throw new Error("FilterSortOptions must be used within a TodoProvider");
+  }
+
+  const { filter, setFilter, sortBy, setSortBy } = context;
 
   return (
     <div className="mb-4">
       {/* フィルター選択 */}
       <select
         value={filter}
-        onChange={function (e) {
+        onChange={function (e: React.ChangeEvent<HTMLSelectElement>) {
           setFilter(e.target.value);
         }}
         className="border p-2 mr-2 rounded"
@@ -26,7 +32,7 @@ function FilterSortOptions() {
       {/* ソート基準選択 */}
       <select
         value={sortBy}
-        onChange={function (e) {
+        onChange={function (e: React.ChangeEvent<HTMLSelectElement>) {
           setSortBy(e.target.value);
         }}
         className="border p-2 rounded"

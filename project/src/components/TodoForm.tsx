@@ -5,7 +5,13 @@ import { TodoContext } from "../context/TodoContext";
 
 function TodoForm() {
   // Contextから必要な値と関数を取得
-  const { newTodo, setNewTodo, addTodo } = React.useContext<any>(TodoContext);
+  const context = React.useContext(TodoContext);
+
+  if (!context) {
+    throw new Error("TodoForm must be used within a TodoProvider");
+  }
+
+  const { newTodo, setNewTodo, addTodo } = context;
 
   return (
     <div className="mb-4">
@@ -13,7 +19,7 @@ function TodoForm() {
       <input
         type="text"
         value={newTodo.title}
-        onChange={function (e) {
+        onChange={function (e: React.ChangeEvent<HTMLInputElement>) {
           setNewTodo({
             ...newTodo,
             title: e.target.value,
@@ -27,7 +33,7 @@ function TodoForm() {
       <input
         type="text"
         value={newTodo.details}
-        onChange={function (e) {
+        onChange={function (e: React.ChangeEvent<HTMLInputElement>) {
           setNewTodo({
             ...newTodo,
             details: e.target.value,
@@ -41,7 +47,7 @@ function TodoForm() {
       <input
         type="date"
         value={newTodo.dueDate || ""}
-        onChange={function (e) {
+        onChange={function (e: React.ChangeEvent<HTMLInputElement>) {
           setNewTodo({
             ...newTodo,
             dueDate: e.target.value,
@@ -53,7 +59,7 @@ function TodoForm() {
       {/* ステータス選択 */}
       <select
         value={newTodo.status}
-        onChange={function (e) {
+        onChange={function (e: React.ChangeEvent<HTMLSelectElement>) {
           setNewTodo({
             ...newTodo,
             status: e.target.value,
